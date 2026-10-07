@@ -1,29 +1,52 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { signOut } from "@/lib/auth/actions";
 import { Logo } from "./logo";
 import { SidebarNav } from "./sidebar-nav";
 
-function UserCard() {
+export type ShellUser = { email: string; name: string | null };
+
+function UserCard({ user }: { user: ShellUser }) {
+  const label = user.name ?? user.email;
+  const initial = (label[0] ?? "?").toUpperCase();
+
   return (
     <div className="flex items-center gap-3 rounded-lg border bg-background/40 p-3">
-      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-sm font-semibold">
-        G
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold">
+        {initial}
       </div>
-      <div className="min-w-0">
-        <p className="truncate text-sm font-medium">Guest</p>
-        <p className="truncate text-xs text-muted-foreground">
-          Sign-in arrives in Phase 3
-        </p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{label}</p>
+        {user.name && (
+          <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+        )}
       </div>
+      <form action={signOut}>
+        <Button
+          type="submit"
+          variant="ghost"
+          size="icon"
+          aria-label="Sign out"
+          title="Sign out"
+        >
+          <LogOut className="h-4 w-4" />
+        </Button>
+      </form>
     </div>
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  user,
+  children,
+}: {
+  user: ShellUser;
+  children: React.ReactNode;
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Close the mobile menu with the Escape key.
@@ -46,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex-1 overflow-y-auto">
           <SidebarNav />
         </div>
-        <UserCard />
+        <UserCard user={user} />
       </aside>
 
       {/* Mobile drawer */}
@@ -72,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex-1 overflow-y-auto">
               <SidebarNav onNavigate={() => setMobileOpen(false)} />
             </div>
-            <UserCard />
+            <UserCard user={user} />
           </aside>
         </div>
       )}

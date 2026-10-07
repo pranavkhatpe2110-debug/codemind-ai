@@ -78,8 +78,14 @@ export default function Home() {
           </nav>
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
-            <Link href="/dashboard" className={buttonVariants({ size: "sm" })}>
-              Open dashboard
+            <Link
+              href="/login"
+              className={buttonVariants({ size: "sm", variant: "ghost" })}
+            >
+              Log in
+            </Link>
+            <Link href="/register" className={buttonVariants({ size: "sm" })}>
+              Sign up
             </Link>
           </div>
         </div>
@@ -109,7 +115,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
-                href="/dashboard"
+                href="/register"
                 className={buttonVariants({ size: "lg" })}
               >
                 Get started
