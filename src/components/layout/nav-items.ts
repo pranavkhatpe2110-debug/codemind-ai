@@ -1,5 +1,6 @@
 import {
   Bug,
+  Code,
   FolderKanban,
   History,
   LayoutDashboard,
@@ -17,6 +18,7 @@ export type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "AI Assistant", href: "/assistant", icon: MessageSquare },
+  { label: "Code Editor", href: "/editor", icon: Code },
   { label: "Code Debugger", href: "/debugger", icon: Bug },
   { label: "Projects", href: "/projects", icon: FolderKanban },
   { label: "History", href: "/history", icon: History },
