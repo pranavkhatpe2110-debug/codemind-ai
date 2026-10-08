@@ -28,7 +28,7 @@ export function ForgotPasswordForm() {
           type="email"
           autoComplete="email"
           placeholder="you@example.com"
-          defaultValue={state.email}
+          key={state.email ?? "new"} defaultValue={state.email}
           required
         />
       </div>
