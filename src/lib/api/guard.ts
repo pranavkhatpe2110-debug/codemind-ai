@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
 import { MAX_REQUEST_CHARS } from "@/lib/anthropic/config";
 import { createClient } from "@/lib/supabase/server";
+import { checkDbLimits } from "./db-limits";
 import { checkRateLimit } from "./rate-limit";
 
 export function jsonError(
@@ -19,7 +20,8 @@ type GuardResult =
 /**
  * Every AI route starts with this. It checks, in order:
  *  1. the user is logged in (otherwise 401)
- *  2. the user is not sending too many requests (otherwise 429)
+ *  2. the user is not sending too many requests: in memory, then in the
+ *     database (per minute and per day) (otherwise 429)
  *  3. the body is not huge and is valid JSON (otherwise 413 / 400)
  */
 export async function guardAiRequest(request: Request): Promise<GuardResult> {
@@ -41,6 +43,16 @@ export async function guardAiRequest(request: Request): Promise<GuardResult> {
         429,
         { "Retry-After": String(limit.retryAfterSeconds) },
       ),
+    };
+  }
+
+  const dbLimit = await checkDbLimits(supabase, user.id);
+  if (!dbLimit.ok) {
+    return {
+      ok: false,
+      response: jsonError(dbLimit.message, dbLimit.status, {
+        "Retry-After": String(dbLimit.retryAfterSeconds),
+      }),
     };
   }
 

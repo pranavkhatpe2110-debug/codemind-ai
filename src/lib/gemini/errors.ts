@@ -37,7 +37,7 @@ export function toGeminiFailure(err: unknown): ApiFailure {
     return {
       status: 502,
       message:
-        "The AI key is not allowed to use this model. Check GEMINI_API_KEY and GEMINI_MODEL in .env.local.",
+        "The AI key was not accepted by Google. Check GEMINI_API_KEY and GEMINI_MODEL in .env.local, or switch AI_PROVIDER.",
     };
   }
   if (status === 404) {

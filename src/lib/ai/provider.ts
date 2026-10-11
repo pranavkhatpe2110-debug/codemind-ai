@@ -5,6 +5,10 @@ import { logAiError, toApiFailure } from "@/lib/anthropic/errors";
 import { streamText as anthropicStream } from "@/lib/anthropic/stream";
 import { logGeminiError, toGeminiFailure } from "@/lib/gemini/errors";
 import { geminiGenerate, geminiStream } from "@/lib/gemini/generate";
+import { compatChunks, compatGenerate } from "@/lib/openai-compat/client";
+import { logCompatError, toCompatFailure } from "@/lib/openai-compat/errors";
+import { mockChunks, mockGenerate } from "@/lib/mock/mock";
+import { textStreamResponse } from "./text-stream";
 import type { AiRequest, ApiFailure } from "./types";
 
 // The ONE place the rest of the app talks to. Every AI feature (Assistant,
@@ -13,13 +17,15 @@ import type { AiRequest, ApiFailure } from "./types";
 //
 //   AI_PROVIDER=gemini      (default)
 //   AI_PROVIDER=anthropic   (Claude, needs Anthropic API credit)
+//   AI_PROVIDER=openai      (any OpenAI-compatible service: Groq, OpenRouter...)
+//   AI_PROVIDER=mock        (fake answers, no key, for testing the screens)
 
-export type AiProvider = "gemini" | "anthropic";
+export type AiProvider = "gemini" | "anthropic" | "openai" | "mock";
 
 export function getProvider(): AiProvider {
-  return process.env.AI_PROVIDER?.trim().toLowerCase() === "anthropic"
-    ? "anthropic"
-    : "gemini";
+  const v = process.env.AI_PROVIDER?.trim().toLowerCase();
+  if (v === "anthropic" || v === "openai" || v === "mock") return v;
+  return "gemini";
 }
 
 export async function generateText(
@@ -37,6 +43,9 @@ export async function generateText(
     return { text: extractText(message), model: message.model, provider };
   }
 
+  if (provider === "mock") return { ...(await mockGenerate(req)), provider };
+  if (provider === "openai") return { ...(await compatGenerate(req)), provider };
+
   const result = await geminiGenerate(req);
   return { ...result, provider };
 }
@@ -50,14 +59,22 @@ export async function streamAiText(req: AiRequest): Promise<Response> {
       signal: req.signal,
     });
   }
+  const p = getProvider();
+  if (p === "mock") return textStreamResponse(mockChunks(req));
+  if (p === "openai") return textStreamResponse(compatChunks(req));
   return geminiStream(req);
 }
 
 export function toAiFailure(err: unknown): ApiFailure {
-  return getProvider() === "anthropic" ? toApiFailure(err) : toGeminiFailure(err);
+  const p = getProvider();
+  if (p === "anthropic") return toApiFailure(err);
+  if (p === "openai") return toCompatFailure(err);
+  return toGeminiFailure(err);
 }
 
 export function logAi(where: string, err: unknown) {
-  if (getProvider() === "anthropic") logAiError(where, err);
+  const p = getProvider();
+  if (p === "anthropic") logAiError(where, err);
+  else if (p === "openai") logCompatError(where, err);
   else logGeminiError(where, err);
 }

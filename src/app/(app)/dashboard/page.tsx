@@ -74,7 +74,7 @@ const QUICK_ACTIONS = [
   },
   {
     label: "Generate Code",
-    description: "Describe it, Claude writes it.",
+    description: "Describe it, AI writes it.",
     href: "/tools/generate",
     icon: Sparkles,
     tone: "bg-violet-500/10 text-violet-500",

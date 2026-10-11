@@ -6,7 +6,6 @@ const PROTECTED_PREFIXES = [
   "/dashboard",
   "/assistant",
   "/editor",
-  "/ai-test",
   "/debugger",
   "/projects",
   "/history",

@@ -15,9 +15,16 @@ import { LanguageSelect } from "./language-select";
 
 const STORAGE_KEY = "codemind:editor-draft";
 
-export function EditorWorkspace() {
-  const [language, setLanguage] = useState(DEFAULT_LANGUAGE);
-  const [code, setCode] = useState(getSample(DEFAULT_LANGUAGE));
+export function EditorWorkspace({
+  defaultLanguage,
+  fontSize,
+}: {
+  defaultLanguage?: string;
+  fontSize?: number;
+} = {}) {
+  const startLanguage = isLanguageId(defaultLanguage) ? defaultLanguage : DEFAULT_LANGUAGE;
+  const [language, setLanguage] = useState(startLanguage);
+  const [code, setCode] = useState(getSample(startLanguage));
   const [loaded, setLoaded] = useState(false);
 
   // Restore the draft saved in this browser (if any).
@@ -102,7 +109,7 @@ export function EditorWorkspace() {
       </div>
 
       <div className="h-[60vh] min-h-[320px] overflow-hidden rounded-xl border">
-        <CodeEditor value={code} onChange={setCode} language={language} />
+        <CodeEditor value={code} onChange={setCode} language={language} fontSize={fontSize} />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
