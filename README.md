@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CodeMind AI
 
-## Getting Started
+An AI coding workspace in the browser: chat with an AI assistant, debug errors, run one-click code tools, and keep your projects and history in one place.
 
-First, run the development server:
+**Live demo:** https://codemind-ai-three.vercel.app
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **AI Assistant** – streaming chat with saved conversations
+- **Debugger** – paste code and an error, get a structured explanation and fix
+- **Code tools** – Explain, Fix, Generate and Optimize code
+- **Projects** – create projects and files, edit them in a Monaco (VS Code-style) editor
+- **History** – browse past conversations and debug sessions
+- **Settings** – profile, preferences, password change, delete your data
+- **Auth** – email/password sign-up with email confirmation (Supabase Auth)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js (App Router) + TypeScript
+- Tailwind CSS + shadcn/ui
+- Supabase (Auth, Postgres, Row Level Security)
+- Google Gemini (default). Anthropic and OpenAI-compatible providers are also supported through the `AI_PROVIDER` setting.
+- Monaco Editor
+- Deployed on Vercel
 
-## Learn More
+## Security
 
-To learn more about Next.js, take a look at the following resources:
+- AI API keys are used only on the server (environment variables), never in the browser.
+- Row Level Security is enabled on every table; users can only read and write their own rows.
+- Per-user rate limits on all AI endpoints.
+- User code is never executed on the server.
+- See [SECURITY.md](./SECURITY.md) and `supabase/audit-rls.sql`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Run locally
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Clone the repo and install dependencies:
+   ```bash
+   npm install
+   ```
+2. Create a Supabase project and run the SQL files in `supabase/migrations`.
+3. Create `.env.local` (never commit it):
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   AI_PROVIDER=gemini
+   GEMINI_API_KEY=your-gemini-key
+   GEMINI_MODEL=gemini-flash-latest
+   ```
+4. Start the dev server:
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+## Deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See [DEPLOY.md](./DEPLOY.md) for the full Vercel + Supabase checklist.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Screenshots
+
+_Add screenshots of the Assistant, Debugger and Projects pages here._
